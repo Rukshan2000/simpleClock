@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Full Screen Clock</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            font-family: 'Roboto', sans-serif;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
+        }
+
+        #clock {
+            font-size: 15vw;
+            text-align: center;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        #battery {
+            font-size: 3vw;
+            text-align: center;
+            font-weight: 400;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        #battery.charging {
+            opacity: 1;
+            color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div id="clock"></div>
+    <div id="battery"></div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+
+            document.getElementById('clock').textContent = timeString;
+        }
+
+        function updateBatteryStatus(battery) {
+            const batteryLevel = Math.round(battery.level * 100);
+            const chargingStatus = battery.charging ? "Charging" : "Not Charging";
+            const batteryInfo = `Battery: ${batteryLevel}% - ${chargingStatus}`;
+            const batteryElement = document.getElementById('battery');
+
+            batteryElement.textContent = batteryInfo;
+            batteryElement.classList.toggle('charging', battery.charging);
+        }
+
+        navigator.getBattery().then(function(battery) {
+            // Update the battery status on load
+            updateBatteryStatus(battery);
+
+            // Add event listeners to update battery status on change
+            battery.addEventListener('levelchange', function() {
+                updateBatteryStatus(battery);
+            });
+
+            battery.addEventListener('chargingchange', function() {
+                updateBatteryStatus(battery);
+            });
+        });
+
+        setInterval(updateClock, 1000); // Update the clock every second
+        updateClock(); // Initial call to display the clock immediately
+    </script>
+</body>
+</html>
